@@ -1,4 +1,5 @@
 import express from 'express'
+import cors from 'cors'
 import schema from './schema'
 import bodyParser from 'body-parser'
 import { graphiqlExpress, graphqlExpress } from 'apollo-server-express'
@@ -25,11 +26,12 @@ mongoose.connection
     throw e
   })
 
-const server = express()
-server.use(bodyParser.json())
-server.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }))
-server.use('/graphql', graphqlExpress((req) => ({
+const app = express()
+app.use(cors())
+app.use(bodyParser.json())
+app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }))
+app.use('/graphql', graphqlExpress((req) => ({
   schema
 })))
 
-server.listen(8000, function () { console.log('app launch on 8000') })
+app.listen(8000, function () { console.log('app launch on 8000') })

@@ -21,7 +21,7 @@ UserTC.addRelation('posts', {
   prepareArgs: {
     filter: source => ({ userId: source._id })
   },
-  projection: { _id: true },
+  projection: { _id: true }
 })
 
 UserTC.addRelation('comments', {
@@ -29,6 +29,5 @@ UserTC.addRelation('comments', {
   prepareArgs: {
     filter: source => ({ userId: source._id })
   },
-  projection: { _id: true },
+  projection: { _id: true }
 })
-

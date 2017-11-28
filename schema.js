@@ -25,7 +25,19 @@ GQC.rootQuery().addFields({
   postMany: PostTC.getResolver('findMany'), // .debug(), // debug info to console for this resolver
   postTotal: PostTC.getResolver('count'),
   postConnection: PostTC.getResolver('connection'),
-  postPagination: PostTC.getResolver('pagination'),
+  postPagination: PostTC.getResolver('pagination').addSortArg({
+    name: 'CREATED_AT_ASC',
+    value: { createdAt: 1 },
+  }).addSortArg({
+    name: 'CREATED_AT_DESC',
+    value: { createdAt: -1 },
+  }).addSortArg({
+    name: 'VIEWS_ASC',
+    value: { views: 1 },
+  }).addSortArg({
+    name: 'VIEWS_DESC',
+    value: { views: -1 },
+  }),
   commentById: CommentTC.getResolver('findById'),
   commentByIds: CommentTC.getResolver('findByIds'),
   commentOne: CommentTC.getResolver('findOne'),
