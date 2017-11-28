@@ -45,7 +45,11 @@ GQC.rootQuery().addFields({
   commentTotal: CommentTC.getResolver('count'),
   commentConnection: CommentTC.getResolver('connection'),
   commentPagination: CommentTC.getResolver('pagination'),
-  tagMany: TagTC.getResolver('findMany') // .debug(), // debug info to console for this resolver
+  tagMany: TagTC.getResolver('findMany').wrapResolve((next) => (rp) => {
+    const r = next(rp)
+    console.log('context:', rp.context)
+    return r
+  }) // .debug(), // debug info to console for this resolver
 })
 
 GQC.rootMutation().addFields({
@@ -77,6 +81,6 @@ GQC.rootMutation().addFields({
   commentRemoveById: CommentTC.getResolver('removeById'),
   commentRemoveOne: CommentTC.getResolver('removeOne'),
   commentRemoveMany: CommentTC.getResolver('removeMany')
-});
+})
 
-module.exports = GQC.buildSchema()
+module.exports = GQC // .buildSchema()
