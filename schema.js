@@ -28,14 +28,14 @@ GQC.rootQuery().addFields({
   userById: UserTC.getResolver('findById'),
   userByIds: UserTC.getResolver('findByIds'),
   userOne: UserTC.getResolver('findOne'),
-  userMany: UserTC.getResolver('findMany'), // .debug(), // debug info to console for this resolver
+  userMany: UserTC.getResolver('findMany'),
   userTotal: UserTC.getResolver('count'),
   userConnection: UserTC.getResolver('connection'),
   userPagination: UserTC.getResolver('pagination'),
   postById: PostTC.getResolver('findById'),
   postByIds: PostTC.getResolver('findByIds'),
   postOne: PostTC.getResolver('findOne'),
-  postMany: PostTC.getResolver('findMany'), // .debug(), // debug info to console for this resolver
+  postMany: PostTC.getResolver('findMany'),
   postTotal: PostTC.getResolver('count'),
   postConnection: PostTC.getResolver('connection'),
   postPagination: PostTC.getResolver('pagination').addSortArg({
@@ -54,16 +54,12 @@ GQC.rootQuery().addFields({
   commentById: CommentTC.getResolver('findById'),
   commentByIds: CommentTC.getResolver('findByIds'),
   commentOne: CommentTC.getResolver('findOne'),
-  commentMany: CommentTC.getResolver('findMany'), // .debug(), // debug info to console for this resolver
+  commentMany: CommentTC.getResolver('findMany'),
   commentTotal: CommentTC.getResolver('count'),
   commentConnection: CommentTC.getResolver('connection'),
   commentPagination: CommentTC.getResolver('pagination'),
   ...authAccess({
-    tagMany: TagTC.getResolver('findMany').wrapResolve((next) => (rp) => {
-      const r = next(rp)
-      console.log('context:', rp.context)
-      return r
-    }) // .debug(), // debug info to console for this resolver
+    tagMany: TagTC.getResolver('findMany')
   })
 })
 
