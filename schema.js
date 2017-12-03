@@ -6,6 +6,19 @@ import { TagTC } from './models/tag'
 import { UserTC } from './models/user'
 import { CommentTC } from './models/comment'
 
+const authAccess = resolvers => {
+  Object.keys(resolvers).forEach((k) => {
+    resolvers[k] = resolvers[k].wrapResolve(next => rp => {
+      // rp = resolveParams = { source, args, context, info }
+      console.log('rp.context :', rp.context)
+      if (!rp.context.authToken) {
+        throw new Error('You should be auth, to have access to this action.')
+      }
+      return next(rp)
+    })
+  })
+  return resolvers
+}
 
 GQC.rootQuery().addFields({
   gqlCompose: {
@@ -45,11 +58,13 @@ GQC.rootQuery().addFields({
   commentTotal: CommentTC.getResolver('count'),
   commentConnection: CommentTC.getResolver('connection'),
   commentPagination: CommentTC.getResolver('pagination'),
-  tagMany: TagTC.getResolver('findMany').wrapResolve((next) => (rp) => {
-    const r = next(rp)
-    console.log('context:', rp.context)
-    return r
-  }) // .debug(), // debug info to console for this resolver
+  ...authAccess({
+    tagMany: TagTC.getResolver('findMany').wrapResolve((next) => (rp) => {
+      const r = next(rp)
+      console.log('context:', rp.context)
+      return r
+    }) // .debug(), // debug info to console for this resolver
+  })
 })
 
 GQC.rootMutation().addFields({
@@ -83,4 +98,4 @@ GQC.rootMutation().addFields({
   commentRemoveMany: CommentTC.getResolver('removeMany')
 })
 
-module.exports = GQC // .buildSchema()
+module.exports = GQC.buildSchema()

@@ -1,9 +1,11 @@
 import express from 'express'
 import cors from 'cors'
-import GQC from './schema'
+import schema from './schema'
 import bodyParser from 'body-parser'
 import { graphiqlExpress, graphqlExpress } from 'apollo-server-express'
 import mongoose from 'mongoose'
+
+import { mergeSchemas, makeExecutableSchema } from 'graphql-tools'
 
 import { AccountsServer } from '@accounts/server'
 import { AccountsPassword } from '@accounts/password'
@@ -13,7 +15,7 @@ import { createJSAccountsGraphQL, JSAccountsContext } from '@accounts/graphql-ap
 const DB_URL = 'mongodb://localhost/nuxt-blog'
 
 mongoose.Promise = global.Promise
-mongoose.set('debug', true) // debug mode on
+mongoose.set('debug', true)
 
 try {
   mongoose.connect(DB_URL, {
@@ -36,16 +38,39 @@ const accountsServer = new AccountsServer({
 
 const accountsGraphQL = createJSAccountsGraphQL(accountsServer)
 
-// console.log('accountsGraphQL :', JSON.stringify(accountsGraphQL))
-const accountsSchema = accountsGraphQL.extendWithResolvers(GQC.types)
-const schema = GQC.buildSchema()
+const resolversWithAccounts = accountsGraphQL.extendWithResolvers({})
+
+const extraSchema = makeExecutableSchema({
+  resolvers: resolversWithAccounts,
+  typeDefs: [
+    `
+    type Query {
+      myQuery: String
+    }
+
+    type Mutation {
+      myMutation: String
+    }
+
+    schema {
+      query: Query,
+      mutation: Mutation
+    }
+    `,
+    accountsGraphQL.schema
+  ]
+})
+
+const mergedSchema = mergeSchemas({
+  schemas: [extraSchema, schema]
+})
 
 const app = express()
 app.use(cors())
 app.use(bodyParser.json())
 app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }))
 app.use('/graphql', graphqlExpress((req) => ({
-  schema,
+  schema: mergedSchema,
   context: JSAccountsContext(req)
 })))
 
